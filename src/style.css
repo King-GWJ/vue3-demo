@@ -1,0 +1,22 @@
+* {
+  margin: 0;
+  padding: 0;
+//box-sizing: border-box;
+  list-style: none;
+  border: 0;
+  cursor: default;
+  text-decoration: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
