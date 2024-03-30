@@ -1,60 +1,84 @@
-import {createRouter, createWebHistory} from 'vue-router'
+import {createRouter, createWebHashHistory} from 'vue-router'
 import Home from "../components/home/Home.vue";
 import Distribution from "../components/home/distribution/Distribution.vue";
-import Sort from "../components/home/sort/Sort.vue";
-import Member from "../components/home/member/Member.vue";
 import Shopping from "../components/home/shopping/Shopping.vue";
 import Mine from "../components/home/mine/Mine.vue";
 import GetAddress from "../components/getAddress/getAddress.vue";
 import SetAddress from "../components/setAddress/setAddress.vue";
+import GetMap from "../components/map/GetMap.vue";
 
 const router = createRouter({
-    history: createWebHistory(import.meta.env.BASE_URL),
+    history: createWebHashHistory(),
     routes: [
         {
             path: '/',
-            name:'home',
-            component:Home,
-            redirect:'/home/distribution',
-            children:[
+            name: 'home',
+            component: Home,
+            redirect: '/home/distribution',
+            children: [
                 {
                     path: '/home/distribution',
-                    name:'distribution',
-                    component:Distribution,
-                },
-                {
-                    path: '/home/sort',
-                    name: 'sort',
-                    component: Sort
-                },
-                {
-                    path: '/home/member',
-                    name: 'member',
-                    component: Member
+                    name: 'distribution',
+                    component: Distribution,
+                    meta: {
+                        title: '配送到家'
+                    },
                 },
                 {
                     path: '/home/shopping',
                     name: 'shopping',
-                    component: Shopping
+                    component: Shopping,
+                    meta: {
+                        title: '购物车'
+                    },
                 },
                 {
                     path: '/home/mine',
                     name: 'mine',
-                    component: Mine
+                    component: Mine,
+                    meta: {
+                        title: '我的'
+                    },
                 },
             ]
         },
         {
             path: '/getAddress',
             name: 'getAddress',
-            component: GetAddress
+            component: GetAddress,
+            meta: {
+                title: '派送地址'
+            },
         },
         {
             path: '/setAddress',
             name: 'setAddress',
-            component: SetAddress
+            component: SetAddress,
+            meta: {
+                title: '地址设置'
+            },
+        },
+        {
+            path: '/map',
+            name: 'GetMap',
+            component: GetMap,
+            meta: {
+                title: '百度地图'
+            },
         }
     ]
 })
+// 全局前置守卫(拦截)
+router.beforeEach((to, from, next) => {
+    // to: 跳转的目标路由，到哪去
+    // from: 来源路由，从哪来
+    // console.log('to', to)
+    // 根据路由元信息修改 title
+    document.title = to.meta.title || 'App'
+    // 根据路由元信息判断此路由是否需要登录
+    // to.matched: 当前路由的所有层级
 
+    // 继续执行
+    next()
+})
 export default router

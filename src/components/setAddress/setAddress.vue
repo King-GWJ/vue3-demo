@@ -1,19 +1,44 @@
 <script setup lang="ts">
 
-    import { areaList } from '@vant/area-data'
-    import router from "../../router";
-    import { ref } from "vue";
-    import { showToast } from 'vant';
+    import {areaList} from '@vant/area-data'
+    import {AddressItem, useAddressStore} from "@/stores/address.ts";
+    import {ref} from "vue";
+    import {showConfirmDialog, showNotify} from 'vant';
+    import {useRoute, useRouter} from "vue-router";
+
     const searchResult = ref([]);
-    // import type {AddressEditInfo} from 'vant';
+    const addressStore = useAddressStore()
+    const router = useRouter()
+    const route = useRoute()
 
-    
-    const onSave = () => showToast('save');
-    const onDelete = () => showToast('delete');
+    // 根据query的id查找数据，有数据表示是编辑页面，反显到页面
+    const addressInfo = ref(addressStore.addressList.find(v => v.id === route.query.id))
 
-    const onChangeDetail = () => {
-        console.log('输入详情地址')
-    }
+    const onSave = (info: AddressItem) => {
+        if (addressInfo.value) {
+            showNotify({ type: 'success', message: '修改成功！' })
+        } else {
+            // 新增地址
+            addressStore.push(info)
+            showNotify({ type: 'success', message: '新增成功！' });
+        }
+        router.back()
+    };
+
+    const onDelete = async () => {
+        try {
+            await showConfirmDialog({
+                title: '警告',
+                message:
+                    '确定要删除此地址吗？',
+            })
+            addressStore.del(addressInfo.value!.id)
+            showNotify({type: 'success',message: '删除成功'})
+            router.back()
+        } catch(e) {
+            showNotify({type: 'warning',message: '取消删除'})
+        }
+    };
 
 </script>
 
@@ -26,14 +51,14 @@
         <main>
             <van-address-edit
                 :area-list="areaList"
-                show-delete
+                :show-delete="!!addressInfo"
                 show-set-default
                 show-search-result
+                :address-info="addressInfo"
                 :search-result="searchResult"
                 :area-columns-placeholder="['请选择', '请选择', '请选择']"
                 @save="onSave"
                 @delete="onDelete"
-                @change-detail="onChangeDetail"
             />
         </main>
     </div>
@@ -59,7 +84,7 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%,-50%);
+            transform: translate(-50%, -50%);
         }
     }
 

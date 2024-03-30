@@ -1,28 +1,20 @@
 <script setup lang="ts">
-    import {ref} from 'vue';
     import {useRouter} from 'vue-router'
+    import {AddressItem, useAddressStore} from "@/stores/address.ts";
 
     const router = useRouter()
-    const chosenAddressId = ref('1');
-    const list = [
-        {
-            id: '1',
-            name: '张三',
-            tel: '13000000000',
-            address: '浙江省杭州市西湖区文三路 138 号东方通信大厦 7 楼 501 室',
-            isDefault: true,
-        },
-        {
-            id: '2',
-            name: '李四',
-            tel: '1310000000',
-            address: '浙江省杭州市拱墅区莫干山路 50 号',
-            isDefault: false
-        },
-    ];
 
-    const onAdd = () => router.push({path: '/setAddress'});
+    //地址数据信息
+    const addressStore = useAddressStore()
 
+    const onEdit = (item: AddressItem) => {
+        router.push({
+            path: '/setAddress',
+            query: {
+                id: item.id
+            }
+        })
+    }
 </script>
 
 <template>
@@ -34,11 +26,14 @@
             </header>
         </header>
         <main>
+            <van-empty v-if="addressStore.addressList.length === 0" class="empty" description="当前还没有地址，快去新增地址吧" />
             <van-address-list
-                v-model="chosenAddressId"
-                :list="list"
+                v-model="addressStore.chosenAddressId"
+                :list="addressStore.addressList"
                 default-tag-text="默认"
-                @add="onAdd" />
+                @add="router.push({path: '/setAddress'})"
+                @edit="onEdit"
+            />
         </main>
     </div>
 </template>
